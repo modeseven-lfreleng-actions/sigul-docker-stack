@@ -1,5 +1,5 @@
 === Database Tables ===
-key_accesses  keys          users       
+key_accesses  keys          users
 
 === User Table Structure (no actual data) ===
 1|aws-us-west-2-dent-sigul-bridge-1.ci.codeaurora.org|106|1

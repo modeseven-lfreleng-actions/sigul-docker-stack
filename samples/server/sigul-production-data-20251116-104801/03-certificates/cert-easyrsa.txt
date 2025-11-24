@@ -45,7 +45,7 @@ Certificate:
             Key ID:
                 b3:8c:6e:5d:8b:8d:db:41:f8:ed:16:94:ab:7a:05:3a:
                 46:f4:07:24
-            Issuer: 
+            Issuer:
                 Directory Name: "CN=EasyRSA"
             Serial Number:
                 00:da:99:94:06:33:56:82:24
@@ -126,16 +126,16 @@ Certificate:
                     0d:53
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
-            X509v3 Subject Key Identifier: 
+            X509v3 Subject Key Identifier:
                 B3:8C:6E:5D:8B:8D:DB:41:F8:ED:16:94:AB:7A:05:3A:46:F4:07:24
-            X509v3 Authority Key Identifier: 
+            X509v3 Authority Key Identifier:
                 keyid:B3:8C:6E:5D:8B:8D:DB:41:F8:ED:16:94:AB:7A:05:3A:46:F4:07:24
                 DirName:/CN=EasyRSA
                 serial:DA:99:94:06:33:56:82:24
 
-            X509v3 Basic Constraints: 
+            X509v3 Basic Constraints:
                 CA:TRUE
-            X509v3 Key Usage: 
+            X509v3 Key Usage:
                 Certificate Sign, CRL Sign
     Signature Algorithm: sha256WithRSAEncryption
          58:33:02:9e:62:2c:6e:31:09:53:21:a3:c4:13:d1:56:fd:73:

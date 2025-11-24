@@ -48,7 +48,7 @@ Certificate:
             Key ID:
                 b3:8c:6e:5d:8b:8d:db:41:f8:ed:16:94:ab:7a:05:3a:
                 46:f4:07:24
-            Issuer: 
+            Issuer:
                 Directory Name: "CN=EasyRSA"
             Serial Number:
                 00:da:99:94:06:33:56:82:24
@@ -133,20 +133,20 @@ Certificate:
                     5c:39
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
-            X509v3 Basic Constraints: 
+            X509v3 Basic Constraints:
                 CA:FALSE
-            X509v3 Subject Key Identifier: 
+            X509v3 Subject Key Identifier:
                 1C:2A:17:A2:62:28:8F:A1:9C:11:9F:2D:10:C5:11:44:E2:C9:FC:84
-            X509v3 Authority Key Identifier: 
+            X509v3 Authority Key Identifier:
                 keyid:B3:8C:6E:5D:8B:8D:DB:41:F8:ED:16:94:AB:7A:05:3A:46:F4:07:24
                 DirName:/CN=EasyRSA
                 serial:DA:99:94:06:33:56:82:24
 
-            X509v3 Extended Key Usage: 
+            X509v3 Extended Key Usage:
                 TLS Web Server Authentication, TLS Web Client Authentication
-            X509v3 Key Usage: 
+            X509v3 Key Usage:
                 Digital Signature, Key Encipherment
-            X509v3 Subject Alternative Name: 
+            X509v3 Subject Alternative Name:
                 DNS:aws-us-west-2-dent-jenkins-sandbox-1.ci.codeaurora.org
     Signature Algorithm: sha256WithRSAEncryption
          7a:2b:2b:33:ce:dc:9b:d0:b9:43:5c:2a:ef:0c:07:aa:c9:60:

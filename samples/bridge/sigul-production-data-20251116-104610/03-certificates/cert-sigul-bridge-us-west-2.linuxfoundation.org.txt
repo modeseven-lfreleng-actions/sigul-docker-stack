@@ -48,7 +48,7 @@ Certificate:
             Key ID:
                 b3:8c:6e:5d:8b:8d:db:41:f8:ed:16:94:ab:7a:05:3a:
                 46:f4:07:24
-            Issuer: 
+            Issuer:
                 Directory Name: "CN=EasyRSA"
             Serial Number:
                 00:da:99:94:06:33:56:82:24
@@ -133,20 +133,20 @@ Certificate:
                     f4:91
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
-            X509v3 Basic Constraints: 
+            X509v3 Basic Constraints:
                 CA:FALSE
-            X509v3 Subject Key Identifier: 
+            X509v3 Subject Key Identifier:
                 3B:BE:8A:60:CD:9A:34:45:64:40:7E:6A:83:19:0A:66:81:9C:64:AC
-            X509v3 Authority Key Identifier: 
+            X509v3 Authority Key Identifier:
                 keyid:B3:8C:6E:5D:8B:8D:DB:41:F8:ED:16:94:AB:7A:05:3A:46:F4:07:24
                 DirName:/CN=EasyRSA
                 serial:DA:99:94:06:33:56:82:24
 
-            X509v3 Extended Key Usage: 
+            X509v3 Extended Key Usage:
                 TLS Web Server Authentication, TLS Web Client Authentication
-            X509v3 Key Usage: 
+            X509v3 Key Usage:
                 Digital Signature, Key Encipherment
-            X509v3 Subject Alternative Name: 
+            X509v3 Subject Alternative Name:
                 DNS:sigul-bridge-us-west-2.linuxfoundation.org
     Signature Algorithm: sha256WithRSAEncryption
          84:cb:3f:90:ff:65:de:9e:02:a7:59:3b:ce:80:f9:c1:84:2d:

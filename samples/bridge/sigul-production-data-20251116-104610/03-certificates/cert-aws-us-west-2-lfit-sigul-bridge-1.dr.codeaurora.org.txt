@@ -48,7 +48,7 @@ Certificate:
             Key ID:
                 b3:8c:6e:5d:8b:8d:db:41:f8:ed:16:94:ab:7a:05:3a:
                 46:f4:07:24
-            Issuer: 
+            Issuer:
                 Directory Name: "CN=EasyRSA"
             Serial Number:
                 00:da:99:94:06:33:56:82:24
@@ -133,20 +133,20 @@ Certificate:
                     9c:43
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
-            X509v3 Basic Constraints: 
+            X509v3 Basic Constraints:
                 CA:FALSE
-            X509v3 Subject Key Identifier: 
+            X509v3 Subject Key Identifier:
                 32:A1:D1:6F:82:E4:42:E4:F4:24:FB:4A:B9:A3:3B:F7:EC:A8:DE:73
-            X509v3 Authority Key Identifier: 
+            X509v3 Authority Key Identifier:
                 keyid:B3:8C:6E:5D:8B:8D:DB:41:F8:ED:16:94:AB:7A:05:3A:46:F4:07:24
                 DirName:/CN=EasyRSA
                 serial:DA:99:94:06:33:56:82:24
 
-            X509v3 Extended Key Usage: 
+            X509v3 Extended Key Usage:
                 TLS Web Server Authentication, TLS Web Client Authentication
-            X509v3 Key Usage: 
+            X509v3 Key Usage:
                 Digital Signature, Key Encipherment
-            X509v3 Subject Alternative Name: 
+            X509v3 Subject Alternative Name:
                 DNS:aws-us-west-2-lfit-sigul-bridge-1.dr.codeaurora.org
     Signature Algorithm: sha256WithRSAEncryption
          9e:15:49:54:94:9a:a9:94:51:93:ba:fb:8b:d5:65:b7:dd:1f:

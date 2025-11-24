@@ -14,7 +14,7 @@
 /usr/share/sigul/server_common.py:            encrypted_passphrase = 'x'
 /usr/share/sigul/server_common.py-        else:
 /usr/share/sigul/server_common.py:            encrypted_passphrase = self.encrypted_passphrase
-/usr/share/sigul/server_common.py-        
+/usr/share/sigul/server_common.py-
 /usr/share/sigul/server_common.py-        try:
 /usr/share/sigul/server_common.py-            passphrase = gpg_decrypt(config,
 /usr/share/sigul/server_common.py:                                     encrypted_passphrase,

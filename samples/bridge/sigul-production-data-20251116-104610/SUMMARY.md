@@ -1,7 +1,7 @@
 # Sigul Production Configuration Extraction Summary
 
-**Hostname:** aws-us-west-2-lfit-sigul-bridge-1.dr.codeaurora.org  
-**Date:** Sun 16 Nov 10:46:13 UTC 2025  
+**Hostname:** aws-us-west-2-lfit-sigul-bridge-1.dr.codeaurora.org
+**Date:** Sun 16 Nov 10:46:13 UTC 2025
 **Output Directory:** ./sigul-production-data-20251116-104610
 
 ## Extraction Sections
@@ -12,7 +12,7 @@
 4. **Database** - Schema, table structure (no sensitive data)
 5. **GnuPG** - Directory structure, config files, key info
 6. **Systemd Services** - Service files, status, drop-ins
-7. **Network** - DNS, hosts, ports, connections (Sigul-specific only)
+7. **Network** - DNS, hosts, ports, connections (Sigul-specific)
 8. **NSS Details** - Modules, database format, crypto policy
 9. **Environment** - Variables, locale, timezone, entropy
 10. **Permissions** - File ownership, modes, SELinux contexts
@@ -29,7 +29,7 @@
 
 ## Files Created
 
-```
+```text
 01-system-info.txt
 02-sigul-configs/all-configs-combined.txt
 02-sigul-configs/bridge.conf
@@ -88,24 +88,31 @@ SUMMARY.md
 ## Key Findings
 
 ### Host Type Detection
+
 - **BRIDGE HOST** - Contains bridge.py
 
 ### Sigul Version
+
 sigul-0.207-1.el7.x86_64
 
 ### Python Version
+
 - Python 2.7.5
 
 ### NSS Database Format
+
 - **Legacy format** (cert8.db, key3.db)
 
 ### Certificates Found
+
 6 certificates in NSS database
 
 ### Database Status
+
 - **Not present** (normal for bridge)
 
 ### GnuPG Status
+
 - **Not present** (normal for bridge)
 
 ## Next Steps
@@ -114,12 +121,15 @@ sigul-0.207-1.el7.x86_64
 2. Compare with containerized stack gap analysis
 3. Update container configuration to match production patterns:
    - Use FHS paths (/etc/sigul/, /etc/pki/sigul/, /var/lib/sigul/)
-   - Implement colon separator config format
+   - Add colon separator config format
    - Add certificate EKU/SAN flags
    - Add missing config parameters (GnuPG, resource limits, TLS versions)
    - Remove [bridge-server] section from bridge config
 4. Test modernized stack with Python 3, current NSS, GPG 2.x
-5. Validate against production behavior patterns
+5. Test against production behavior patterns
 
 ---
-**Extraction completed successfully**
+
+## Extraction Status
+
+Extraction completed
