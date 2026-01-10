@@ -113,7 +113,7 @@ test_network_connectivity() {
         "https://download.fedoraproject.org/pub/epel/"
         "https://kojipkgs.fedoraproject.org/repos-dist/epel9-infra/"
         "https://github.com/ModeSevenIndustrialSolutions/sigul"
-        "https://github.com/ModeSevenIndustrialSolutions/python-nss"
+        "https://github.com/ModeSevenIndustrialSolutions/python-nss-ng"
     )
 
     local failed_urls=()
