@@ -53,10 +53,10 @@ install_from_source() {
     mkdir -p "$build_dir"
     cd "$build_dir"
 
-    # Clone source from GitHub fork
-    log_info "Cloning sigul v${SIGUL_VERSION} from GitHub fork"
+    # Clone source from official Pagure repository
+    log_info "Cloning sigul v${SIGUL_VERSION} from official Pagure repository"
     git clone --depth 1 --branch "v${SIGUL_VERSION}" \
-        https://github.com/ModeSevenIndustrialSolutions/sigul.git sigul
+        https://pagure.io/sigul.git sigul
 
     cd sigul
 
