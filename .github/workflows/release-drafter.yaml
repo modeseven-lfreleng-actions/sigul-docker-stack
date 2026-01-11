@@ -61,11 +61,11 @@ jobs:
     steps:
       # Harden the runner used by this workflow
       # yamllint disable-line rule:line-length
-      - uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+      - uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
         with:
           egress-policy: 'audit'
 
       # yamllint disable-line rule:line-length
-      - uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5 # v6.1.0
+      - uses: release-drafter/release-drafter@7cf306f56b79636bb76931494ccf29fc893763bd # v6.1.0
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
