@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+#
+# Patch: Fix Sigul Bridge crash when python3-fedora is not available
+# See: bridge-no-fas.patch.README.md for full documentation
+--- a/src/bridge.py
++++ b/src/bridge.py
+@@ -1494,11 +1494,16 @@ def main():
+             os.seteuid(config.daemon_uid)
+             utils.update_HOME_for_uid(config)
+             # Ugly hack: FAS uses $HOME at time of import
+-            fedora.client.baseclient.SESSION_DIR = \
+-                os.path.expanduser('~/.fedora')
+-            fedora.client.baseclient.SESSION_FILE = \
+-                os.path.join(fedora.client.baseclient.SESSION_DIR,
+-                             '.fedora_session')
++            # Set FAS session paths if FAS module is available
++            # Without this check, accessing fedora.client when have_fas=False
++            # causes: NameError: name 'fedora' is not defined
++            if have_fas:
++                fedora.client.baseclient.SESSION_DIR = \
++                    os.path.expanduser('~/.fedora')
++                fedora.client.baseclient.SESSION_FILE = \
++                    os.path.join(fedora.client.baseclient.SESSION_DIR,
++                                 '.fedora_session')
++            # If have_fas is False, FAS session setup skips (no-op)
+         except Exception:
+             logging.error('Error switching to user %d: %s', config.daemon_uid,
+                           sys.exc_info()[1])

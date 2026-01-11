@@ -30,11 +30,34 @@ RUN dnf update -y && \
         wget rsync && \
     dnf clean all
 
-# Install EPEL-dependent packages and Python packages via pip
+# Install RPM development libraries (required to build rpm-head-signing from source)
 # Note: nss-devel and nspr-devel removed - python-nss-ng installed from PyPI (pre-built)
+#
+# RPM-HEAD-SIGNING BUILD RATIONALE:
+# ---------------------------------
+# Fedora 43 ships with RPM 6.0.x, but the packaged rpm-head-signing (v1.7.4-11.fc43)
+# was built against an older RPM API and has a binary incompatibility issue:
+#   ImportError: undefined symbol: rpmWriteSignature
+#
+# This symbol was removed or changed in RPM 6.0.x, causing the pre-compiled Python
+# extension (insertlib.cpython-314-*.so) to fail at runtime.
+#
+# SOLUTION:
+# Build rpm-head-signing v1.7.6 from source, which includes RPM 6.0 support.
+# This requires several build dependencies:
+#   - rpm-devel, rpm-libs: RPM development headers for compiling the C extension
+#   - krb5-devel: Required to build the gssapi Python dependency
+#   - python3-rpm: System RPM Python bindings (NOT the PyPI 'rpm' package)
+#
+# The build script (install-rpm-head-signing.sh) handles:
+#   1. Cloning rpm-head-signing v1.7.6 from GitHub
+#   2. Installing dependencies (cryptography, koji, xattr) separately
+#   3. Building rpm-head-signing WITHOUT installing the conflicting PyPI 'rpm' package
+#   4. Using system python3-rpm bindings instead
+#
 RUN dnf install -y --setopt=install_weak_deps=False \
-        rpm-head-signing jq python3-gpg && \
-    pip3 install SQLAlchemy==1.3.24 && \
+        rpm-devel rpm-libs krb5-devel python3-rpm jq python3-gpg && \
+    pip3 install SQLAlchemy==1.3.24 passlib && \
     dnf clean all
 
 # Copy patches for debugging (if they exist)
@@ -48,16 +71,25 @@ RUN chmod +x /tmp/install-python-nss.sh && \
     /tmp/install-python-nss.sh --verify && \
     rm /tmp/install-python-nss.sh
 
+# Build and install rpm-head-signing from source for RPM 6.0.x compatibility
+# See detailed rationale in comments above the rpm-devel installation
+ENV RPM_HEAD_SIGNING_VERSION=1.7.6
+COPY build-scripts/install-rpm-head-signing.sh /tmp/install-rpm-head-signing.sh
+RUN chmod +x /tmp/install-rpm-head-signing.sh && \
+    /tmp/install-rpm-head-signing.sh --verify && \
+    rm /tmp/install-rpm-head-signing.sh
+
 # Copy and run sigul installation script
 COPY build-scripts/install-sigul.sh /tmp/install-sigul.sh
 RUN chmod +x /tmp/install-sigul.sh && \
     /tmp/install-sigul.sh --verify server && \
     rm /tmp/install-sigul.sh && \
-    rm -rf /tmp/patches
+    rm -rf /tmp/patches && \
+    rm -f /etc/sigul/*.conf
 
 # Production-aligned initialization
 
-# Copy production-aligned entrypoint script
+# Copy production entrypoint script
 COPY scripts/entrypoint-server.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
@@ -75,9 +107,9 @@ RUN chmod +x /usr/local/bin/validate-nss.sh /usr/local/bin/health.sh
 
 # Copy shared PKI files for certificate generation (permissions set later after user creation)
 COPY pki/ /workspace/pki/
-# Copy production-aligned certificate generation script
-COPY pki/generate-production-aligned-certs.sh /usr/local/bin/generate-production-aligned-certs.sh
-RUN chmod +x /usr/local/bin/generate-production-aligned-certs.sh
+# Copy production certificate generation script
+COPY pki/generate-production-certs.sh /usr/local/bin/generate-production-certs.sh
+RUN chmod +x /usr/local/bin/generate-production-certs.sh
 
 # Create sigul user and directories with consistent UID 1000 and GID 1000
 # Handle both RPM-created users (x86_64) and manual creation (ARM64)
@@ -127,7 +159,7 @@ WORKDIR /var/lib/sigul/server
 # Switch to sigul user (directories already created with proper ownership above)
 USER sigul
 
-# Set entrypoint - production-aligned direct invocation
+# Set entrypoint - production direct invocation
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Health check - verify server process is running

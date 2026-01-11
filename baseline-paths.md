@@ -31,7 +31,7 @@ SPDX-FileCopyrightText: 2025 The Linux Foundation
 └── gnupg/           # GPG keyring location
 ```
 
-## Target Production-Aligned Paths
+## Target Production Paths
 
 ### FHS-Compliant Structure (Target)
 
@@ -78,7 +78,7 @@ SPDX-FileCopyrightText: 2025 The Linux Foundation
 - `sigul_server_logs` → `/opt/sigul/logs`
 - `sigul_server_data` → `/opt/sigul/data`
 
-### Target Volume Mappings (Production-Aligned)
+### Target Volume Mappings (Production)
 
 - `sigul_bridge_config` → `/etc/sigul` (config files only)
 - `sigul_bridge_nss` → `/etc/pki/sigul/bridge` (NSS databases)

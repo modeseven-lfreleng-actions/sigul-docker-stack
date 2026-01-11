@@ -69,7 +69,7 @@ test_bridge_cert_generation() {
                 NSS_PASSWORD="${NSS_PASSWORD}" \
                 COMPONENT="bridge" \
                 FQDN="test-bridge.example.org" \
-                bash "$(dirname "$0")/../pki/generate-production-aligned-certs.sh" 2>&1); then
+                bash "$(dirname "$0")/../pki/generate-production-certs.sh" 2>&1); then
         success "Bridge certificate generation succeeded"
     else
         error "Bridge certificate generation FAILED"
@@ -99,7 +99,7 @@ test_server_cert_generation() {
                 NSS_PASSWORD="${NSS_PASSWORD}" \
                 COMPONENT="server" \
                 FQDN="test-server.example.org" \
-                bash "$(dirname "$0")/../pki/generate-production-aligned-certs.sh" 2>&1); then
+                bash "$(dirname "$0")/../pki/generate-production-certs.sh" 2>&1); then
         success "Server certificate generation succeeded"
     else
         error "Server certificate generation FAILED"
@@ -299,7 +299,7 @@ main() {
         error "Serial number collision fix may not be working correctly!"
         echo ""
         log "Please review the errors above and check:"
-        log "  1. Is generate-production-aligned-certs.sh using auto-generated serials?"
+        log "  1. Is generate-production-certs.sh using auto-generated serials?"
         log "  2. Is the -m flag removed from certutil -S commands?"
         log "  3. Are NSS tools installed and working correctly?"
         echo ""

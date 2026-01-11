@@ -468,6 +468,13 @@ generate_bridge_config() {
     mkdir -p "${SHARED_CONFIG_DIR}"
     chmod 755 "${SHARED_CONFIG_DIR}"
 
+    # Remove any template config files from image (should be cleaned at build time)
+    # This ensures we always generate fresh configs that match current certificates
+    if [[ -f "${config_file}" ]]; then
+        debug "Removing existing config file to ensure fresh generation"
+        rm -f "${config_file}"
+    fi
+
     # Generate configuration
     cat > "${config_file}" << EOF
 # Sigul Bridge Configuration
@@ -518,6 +525,13 @@ generate_server_config() {
     # Create config directory if needed
     mkdir -p "${SHARED_CONFIG_DIR}"
     chmod 755 "${SHARED_CONFIG_DIR}"
+
+    # Remove any template config files from image (should be cleaned at build time)
+    # This ensures we always generate fresh configs that match current certificates
+    if [[ -f "${config_file}" ]]; then
+        debug "Removing existing config file to ensure fresh generation"
+        rm -f "${config_file}"
+    fi
 
     # Generate configuration
     cat > "${config_file}" << EOF
@@ -710,13 +724,56 @@ main() {
         success "Certificate initialization completed successfully"
     else
         log "Certificates already exist and are valid"
-        log "Use CERT_INIT_MODE=force to regenerate"
+        log "Regenerating configuration files to ensure consistency..."
+
+        # CRITICAL: Always regenerate config files even if certs exist
+        # This ensures configs always match the current certificate state and prevents
+        # issues where Docker volumes might contain stale template configs from the image.
+        # Config files MUST reference the correct certificate nicknames and paths.
+        generate_bridge_config
+        generate_server_config
+
+        log "Use CERT_INIT_MODE=force to regenerate certificates"
         display_certificate_info
-        success "Certificate initialization skipped (certificates exist)"
+        success "Certificate initialization skipped (certificates exist, configs regenerated)"
     fi
 
     log ""
     log "Certificate initialization complete"
+    log ""
+    log "=== Final Debug: Verifying Generated Files ==="
+    log "Checking /etc/sigul directory:"
+    if [ -d /etc/sigul ]; then
+        find /etc/sigul -ls 2>&1 | sed 's/^/  /' || log "  (cannot list)"
+    else
+        log "  Directory does not exist!"
+    fi
+    log ""
+    log "Checking /etc/pki/sigul/bridge directory:"
+    if [ -d /etc/pki/sigul/bridge ]; then
+        find /etc/pki/sigul/bridge -ls 2>&1 | sed 's/^/  /' || log "  (cannot list)"
+    else
+        log "  Directory does not exist!"
+    fi
+    log ""
+    log "Checking if bridge.conf is readable:"
+    if [ -f "${SHARED_CONFIG_DIR}/bridge.conf" ]; then
+        log "  ✓ bridge.conf exists at ${SHARED_CONFIG_DIR}/bridge.conf"
+        log "  File size: $(wc -c < "${SHARED_CONFIG_DIR}/bridge.conf" 2>/dev/null || echo 'unknown') bytes"
+        log "  Permissions: $(stat -c '%A %U %G' "${SHARED_CONFIG_DIR}/bridge.conf" 2>/dev/null || stat -f '%Sp %Su %Sg' "${SHARED_CONFIG_DIR}/bridge.conf" 2>/dev/null || echo 'unknown')"
+    else
+        log "  ✗ bridge.conf NOT found at ${SHARED_CONFIG_DIR}/bridge.conf"
+    fi
+    log ""
+    log "Checking if server.conf is readable:"
+    if [ -f "${SHARED_CONFIG_DIR}/server.conf" ]; then
+        log "  ✓ server.conf exists at ${SHARED_CONFIG_DIR}/server.conf"
+        log "  File size: $(wc -c < "${SHARED_CONFIG_DIR}/server.conf" 2>/dev/null || echo 'unknown') bytes"
+        log "  Permissions: $(stat -c '%A %U %G' "${SHARED_CONFIG_DIR}/server.conf" 2>/dev/null || stat -f '%Sp %Su %Sg' "${SHARED_CONFIG_DIR}/server.conf" 2>/dev/null || echo 'unknown')"
+    else
+        log "  ✗ server.conf NOT found at ${SHARED_CONFIG_DIR}/server.conf"
+    fi
+    log "=============================================="
 }
 
 # Execute main function

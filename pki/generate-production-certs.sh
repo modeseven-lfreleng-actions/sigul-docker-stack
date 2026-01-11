@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# Production-Aligned Certificate Generation Script
+# Production Certificate Generation Script
 #
-# This script generates NSS certificates with production-aligned attributes:
+# This script generates NSS certificates with production attributes:
 # - FQDN-based Common Names
 # - Subject Alternative Names (SAN)
 # - Extended Key Usage (serverAuth + clientAuth)
@@ -16,7 +16,7 @@
 #   NSS_PASSWORD=secret \
 #   COMPONENT=bridge \
 #   FQDN=sigul-bridge.example.org \
-#   ./generate-production-aligned-certs.sh
+#   ./generate-production-certs.sh
 #
 # Environment Variables:
 #   NSS_DB_DIR - NSS database directory (required)
@@ -521,7 +521,7 @@ cleanup() {
 
 # Main execution
 main() {
-    log "=== Production-Aligned Certificate Generation ==="
+    log "=== Production Certificate Generation ==="
     log "Script version: 1.0.0"
     echo ""
 

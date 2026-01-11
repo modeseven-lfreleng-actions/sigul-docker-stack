@@ -5,7 +5,7 @@ SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 # Sigul Operations Guide
 
-This guide covers day-to-day operations, monitoring, and maintenance of the production-aligned Sigul container stack.
+This guide covers day-to-day operations, monitoring, and maintenance of the production Sigul container stack.
 
 ---
 

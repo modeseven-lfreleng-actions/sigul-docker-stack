@@ -26,6 +26,7 @@ services:
   # Certificate Initialization Container (Init Container Pattern)
   # Runs before services start to ensure certificates exist
   cert-init:
+    image: ${SIGUL_BRIDGE_IMAGE:-sigul-bridge:latest}
     build:
       context: .
       dockerfile: Dockerfile.bridge
@@ -63,6 +64,7 @@ services:
 
   # Sigul Server Container
   sigul-server:
+    image: ${SIGUL_SERVER_IMAGE:-sigul-server:latest}
     build:
       context: .
       dockerfile: Dockerfile.server
@@ -113,6 +115,7 @@ services:
 
   # Sigul Bridge Container
   sigul-bridge:
+    image: ${SIGUL_BRIDGE_IMAGE:-sigul-bridge:latest}
     build:
       context: .
       dockerfile: Dockerfile.bridge

@@ -190,7 +190,7 @@ get_nss_password() {
 #######################################
 
 setup_bridge_ca() {
-    log "Setting up bridge as Certificate Authority (production-aligned)"
+    log "Setting up bridge as Certificate Authority (production)"
 
     local bridge_nss_dir="$NSS_BASE_DIR/bridge"
     local bridge_fqdn="${BRIDGE_FQDN:-sigul-bridge.example.org}"
@@ -203,21 +203,21 @@ setup_bridge_ca() {
         return 0
     fi
 
-    log "Generating production-aligned certificates for bridge..."
+    log "Generating production certificates for bridge..."
 
-    # Use production-aligned certificate generation script
-    if [[ -x "/usr/local/bin/generate-production-aligned-certs.sh" ]]; then
+    # Use production certificate generation script
+    if [[ -x "/usr/local/bin/generate-production-certs.sh" ]]; then
         NSS_DB_DIR="$bridge_nss_dir" \
         NSS_PASSWORD="$(get_nss_password)" \
         COMPONENT="bridge" \
         FQDN="$bridge_fqdn" \
-        /usr/local/bin/generate-production-aligned-certs.sh
-    elif [[ -x "/workspace/pki/generate-production-aligned-certs.sh" ]]; then
+        /usr/local/bin/generate-production-certs.sh
+    elif [[ -x "/workspace/pki/generate-production-certs.sh" ]]; then
         NSS_DB_DIR="$bridge_nss_dir" \
         NSS_PASSWORD="$(get_nss_password)" \
         COMPONENT="bridge" \
         FQDN="$bridge_fqdn" \
-        /workspace/pki/generate-production-aligned-certs.sh
+        /workspace/pki/generate-production-certs.sh
     else
         fatal "Production-aligned certificate generation script not found"
     fi
@@ -230,7 +230,7 @@ setup_bridge_ca() {
 #######################################
 
 setup_server_certificates() {
-    log "Setting up server certificates (production-aligned)"
+    log "Setting up server certificates (production)"
 
     local server_nss_dir="$NSS_BASE_DIR/server"
     local server_fqdn="${SERVER_FQDN:-sigul-server.example.org}"
@@ -265,21 +265,21 @@ setup_server_certificates() {
         warn "Bridge CA not available, server will generate with fallback method"
     fi
 
-    log "Generating production-aligned certificates for server..."
+    log "Generating production certificates for server..."
 
-    # Use production-aligned certificate generation script
-    if [[ -x "/usr/local/bin/generate-production-aligned-certs.sh" ]]; then
+    # Use production certificate generation script
+    if [[ -x "/usr/local/bin/generate-production-certs.sh" ]]; then
         NSS_DB_DIR="$server_nss_dir" \
         NSS_PASSWORD="$(get_nss_password)" \
         COMPONENT="server" \
         FQDN="$server_fqdn" \
-        /usr/local/bin/generate-production-aligned-certs.sh
-    elif [[ -x "/workspace/pki/generate-production-aligned-certs.sh" ]]; then
+        /usr/local/bin/generate-production-certs.sh
+    elif [[ -x "/workspace/pki/generate-production-certs.sh" ]]; then
         NSS_DB_DIR="$server_nss_dir" \
         NSS_PASSWORD="$(get_nss_password)" \
         COMPONENT="server" \
         FQDN="$server_fqdn" \
-        /workspace/pki/generate-production-aligned-certs.sh
+        /workspace/pki/generate-production-certs.sh
     else
         fatal "Production-aligned certificate generation script not found"
     fi
@@ -294,7 +294,7 @@ setup_server_certificates() {
 #######################################
 
 setup_client_certificates() {
-    log "Setting up client certificates (production-aligned)"
+    log "Setting up client certificates (production)"
 
     local client_nss_dir="$NSS_BASE_DIR/client"
     local client_fqdn="${CLIENT_FQDN:-sigul-client.example.org}"
@@ -375,21 +375,21 @@ setup_client_certificates() {
 
     success "CA files copied to client import location"
 
-    log "Generating production-aligned certificates for client..."
+    log "Generating production certificates for client..."
 
-    # Use production-aligned certificate generation script
-    if [[ -x "/usr/local/bin/generate-production-aligned-certs.sh" ]]; then
+    # Use production certificate generation script
+    if [[ -x "/usr/local/bin/generate-production-certs.sh" ]]; then
         NSS_DB_DIR="$client_nss_dir" \
         NSS_PASSWORD="$(get_nss_password)" \
         COMPONENT="client" \
         FQDN="$client_fqdn" \
-        /usr/local/bin/generate-production-aligned-certs.sh
-    elif [[ -x "/workspace/pki/generate-production-aligned-certs.sh" ]]; then
+        /usr/local/bin/generate-production-certs.sh
+    elif [[ -x "/workspace/pki/generate-production-certs.sh" ]]; then
         NSS_DB_DIR="$client_nss_dir" \
         NSS_PASSWORD="$(get_nss_password)" \
         COMPONENT="client" \
         FQDN="$client_fqdn" \
-        /workspace/pki/generate-production-aligned-certs.sh
+        /workspace/pki/generate-production-certs.sh
     else
         fatal "Production-aligned certificate generation script not found"
     fi
@@ -453,7 +453,7 @@ generate_configuration() {
     local role="$1"
     local config_file="$CONFIG_DIR/$role.conf"
 
-    log "Generating production-aligned configuration for $role"
+    log "Generating production configuration for $role"
 
     # Configuration variables
     local nss_password
@@ -464,7 +464,7 @@ generate_configuration() {
     local server_port="${SERVER_PORT:-44333}"
     local bridge_port="${BRIDGE_PORT:-44333}"
 
-    # Generate role-specific configuration (production-aligned)
+    # Generate role-specific configuration (production)
     case "$role" in
         "bridge")
             cat > "$config_file" << EOF

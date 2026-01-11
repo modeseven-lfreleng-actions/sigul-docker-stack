@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# Sigul Bridge Entrypoint - Production-Aligned
+# Sigul Bridge Entrypoint - Production
 #
-# This script provides a simplified, production-aligned entrypoint for the Sigul bridge.
+# This script provides a simplified, production entrypoint for the Sigul bridge.
 # It matches the direct invocation pattern used in production deployments.
 #
 # Production Pattern:
@@ -165,7 +165,7 @@ start_bridge_service() {
 
     success "Bridge initialized successfully"
 
-    # Execute bridge service with production-aligned command
+    # Execute bridge service with production command
     # Using exec to replace shell process with bridge process
     exec /usr/sbin/sigul_bridge
 }
@@ -175,8 +175,35 @@ start_bridge_service() {
 #######################################
 
 main() {
-    log "Sigul Bridge Entrypoint (Production-Aligned)"
+    log "Sigul Bridge Entrypoint (Production)"
     log "=============================================="
+
+    # Debug: Show environment and mounted volumes
+    log "Debug: Environment variables:"
+    log "  NSS_PASSWORD: ${NSS_PASSWORD:+[SET]}"
+    log "  BRIDGE_FQDN: ${BRIDGE_FQDN:-[NOT SET]}"
+    log "  DEBUG: ${DEBUG:-[NOT SET]}"
+    log ""
+    log "Debug: Checking mounted volumes and files:"
+    if [ -d /etc/sigul ]; then
+        log "  /etc/sigul exists: YES"
+    else
+        log "  /etc/sigul exists: NO"
+    fi
+    if [ -d /etc/sigul ]; then
+        log "  /etc/sigul contents:"
+        find /etc/sigul -ls 2>&1 | sed 's/^/    /' || log "    (cannot list)"
+    fi
+    if [ -d /etc/pki/sigul/bridge ]; then
+        log "  /etc/pki/sigul/bridge exists: YES"
+    else
+        log "  /etc/pki/sigul/bridge exists: NO"
+    fi
+    if [ -d /etc/pki/sigul/bridge ]; then
+        log "  /etc/pki/sigul/bridge contents:"
+        find /etc/pki/sigul/bridge -ls 2>&1 | sed 's/^/    /' || log "    (cannot list)"
+    fi
+    log ""
 
     # Run pre-flight validation
     validate_configuration
