@@ -20,11 +20,12 @@ MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Configuration
-COMPONENT="${1:-client}"
-PLATFORM="${2:-linux/amd64}"
+COMPONENT="${COMPONENT:-}"
+PLATFORM="${PLATFORM:-linux/amd64}"
 NO_CACHE="${NO_CACHE:-false}"
 BUILDKIT_PROGRESS="${BUILDKIT_PROGRESS:-plain}"
 VERBOSE="${VERBOSE:-false}"
+DEBUG="${DEBUG:-false}"
 
 # Timing variables
 START_TIME=$(date +%s)
@@ -50,6 +51,13 @@ log_error() {
     echo -e "${RED}[$(printf '%3d' $elapsed)s]${NC} $*"
 }
 
+log_debug() {
+    if [[ "${DEBUG}" == "true" ]]; then
+        local elapsed=$(($(date +%s) - START_TIME))
+        echo -e "${CYAN}[DEBUG $(printf '%3d' $elapsed)s]${NC} $*"
+    fi
+}
+
 log_stage() {
     local elapsed=$(($(date +%s) - START_TIME))
     echo ""
@@ -63,23 +71,24 @@ usage() {
     cat << EOF
 ${CYAN}Debug Local Docker Build${NC}
 
-Usage: $0 [COMPONENT] [PLATFORM] [OPTIONS]
+Usage: $0 [OPTIONS] [COMPONENT] [PLATFORM]
 
 Arguments:
     COMPONENT    Component to build (client|server|bridge) [default: client]
     PLATFORM     Platform to build for (linux/amd64|linux/arm64) [default: linux/amd64]
 
-Environment Variables:
-    NO_CACHE=true         Build without cache
-    VERBOSE=true          Show verbose Docker output
-    BUILDKIT_PROGRESS     BuildKit progress output (auto|plain|tty) [default: plain]
+Options:
+    -h, --help       Show this help message
+    -d, --debug      Enable debug logging
+    -v, --verbose    Show verbose Docker output
+    -n, --no-cache   Build without cache
 
 Examples:
     $0                              # Build client for amd64
     $0 server                       # Build server for amd64
     $0 client linux/arm64           # Build client for arm64
-    NO_CACHE=true $0 client         # Build client without cache
-    VERBOSE=true $0 server          # Build server with verbose output
+    $0 --no-cache client            # Build client without cache
+    $0 --debug --verbose server     # Build server with debug output
 
 EOF
 }
@@ -178,8 +187,6 @@ pre_build_checks() {
     fi
 
     local required_scripts=(
-        "setup-repositories.sh"
-        "install-python.sh"
         "install-python-nss.sh"
     )
 
@@ -229,13 +236,19 @@ build_image() {
     # Change to project root for build context
     cd "${PROJECT_ROOT}"
 
+    # Set environment variables for BuildKit to force output
+    export BUILDKIT_PROGRESS=plain
+    export DOCKER_BUILDKIT=1
+
+    log_debug "Environment: BUILDKIT_PROGRESS=${BUILDKIT_PROGRESS}, DOCKER_BUILDKIT=${DOCKER_BUILDKIT}"
+
     # Prepare build arguments
     local build_args=(
         docker buildx build
         --platform "${PLATFORM}"
         --file "${dockerfile}"
         --tag "${image_tag}"
-        --progress="${BUILDKIT_PROGRESS}"
+        --progress=plain
         --load
     )
 
@@ -245,27 +258,31 @@ build_image() {
         log_warning "Cache disabled - build will take longer"
     fi
 
-    # Add verbose output if requested
-    if [[ "${VERBOSE}" == "true" ]]; then
-        build_args+=(--progress=plain)
-    fi
-
     # Add build context
     build_args+=(.)
 
     log_info "Starting build..."
+    log_info "You should see build output below in real-time..."
     echo ""
     echo -e "${CYAN}Build Command:${NC}"
     echo "  ${build_args[*]}"
     echo ""
+    echo "=========================================="
+    echo ""
 
     build_start=$(date +%s)
 
-    # Run the build
-    if "${build_args[@]}"; then
-        build_end=$(date +%s)
-        duration=$((build_end - build_start))
+    # Run the build directly to terminal - this will show all output
+    "${build_args[@]}"
+    local build_result=$?
 
+    echo ""
+    echo "=========================================="
+
+    build_end=$(date +%s)
+    duration=$((build_end - build_start))
+
+    if [ $build_result -eq 0 ]; then
         log_success "Build completed successfully!"
         log_success "Build duration: ${duration}s ($(printf '%d:%02d' $((duration/60)) $((duration%60))))"
 
@@ -289,9 +306,6 @@ build_image() {
 
         return 0
     else
-        build_end=$(date +%s)
-        duration=$((build_end - build_start))
-
         log_error "Build failed after ${duration}s"
         return 1
     fi
@@ -323,10 +337,50 @@ print_summary() {
 
 # Main function
 main() {
-    # Parse help flag
-    if [[ "${1:-}" == "-h" ]] || [[ "${1:-}" == "--help" ]]; then
-        usage
-        exit 0
+    # Parse command line arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            -d|--debug)
+                DEBUG=true
+                VERBOSE=true  # Auto-enable verbose when debug is on
+                shift
+                ;;
+            -v|--verbose)
+                VERBOSE=true
+                shift
+                ;;
+            -n|--no-cache)
+                NO_CACHE=true
+                shift
+                ;;
+            -*)
+                log_error "Unknown option: $1"
+                usage
+                exit 1
+                ;;
+            *)
+                # Positional arguments
+                if [[ -z "${COMPONENT}" ]]; then
+                    COMPONENT="$1"
+                elif [[ "${PLATFORM}" == "linux/amd64" ]]; then
+                    PLATFORM="$1"
+                else
+                    log_error "Too many arguments: $1"
+                    usage
+                    exit 1
+                fi
+                shift
+                ;;
+        esac
+    done
+
+    # Set default component if not specified
+    if [[ -z "${COMPONENT}" ]]; then
+        COMPONENT="client"
     fi
 
     log_stage "Docker Build Debug Tool"
