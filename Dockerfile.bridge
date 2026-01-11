@@ -2,29 +2,24 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 # Simplified Dockerfile for sigul bridge using dedicated build scripts
-FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+FROM fedora:43
 
 LABEL maintainer="releng@linuxfoundation.org"
 LABEL org.opencontainers.image.title="Sigul Bridge"
 LABEL org.opencontainers.image.description="Simplified Linux Foundation signing infrastructure bridge"
 LABEL org.opencontainers.image.source="https://github.com/lfreleng-actions/sigul-sign-docker"
 
-# Install package managers and required dependencies
-RUN microdnf install -y dnf && \
-    microdnf clean all
+# Update package manager
+RUN dnf update -y && \
+    dnf clean all
 
-# Setup repositories using dedicated script for better reliability
-COPY build-scripts/setup-repositories.sh /tmp/setup-repositories.sh
-RUN chmod +x /tmp/setup-repositories.sh && \
-    /tmp/setup-repositories.sh --test && \
-    rm /tmp/setup-repositories.sh
-
-# Install base dependencies available in UBI 9 repositories
+# Install base dependencies available in Fedora repositories
+# Note: Fedora 43 includes Python 3.13 as the default python3 package
 RUN dnf update -y && \
     dnf install -y --setopt=install_weak_deps=False \
         git which tar xz \
-        python3-devel python3-pip python3-setuptools python3-cryptography \
-        python3-requests python3-six python3-pexpect \
+        python3 python3-devel python3-pip python3-setuptools \
+        python3-cryptography python3-requests python3-six python3-pexpect \
         sqlite \
         nss-tools nmap-ncat \
         hostname iproute net-tools \
@@ -45,13 +40,7 @@ RUN dnf install -y --setopt=install_weak_deps=False \
 # Copy patches for debugging (if they exist)
 COPY patches/ /tmp/patches/
 
-# Install Python 3.13 (Python 3.9 is EOL, python-nss-ng wheels require 3.10+)
-COPY build-scripts/install-python.sh /tmp/install-python.sh
-RUN chmod +x /tmp/install-python.sh && \
-    /tmp/install-python.sh --version 3.13.11 --verify && \
-    rm /tmp/install-python.sh
-
-# Install python-nss-ng from PyPI (now compatible with Python 3.13)
+# Install python-nss-ng from PyPI (compatible with Python 3.13)
 ENV INSTALL_SOURCE=pypi
 ENV PYTHON_NSS_NG_VERSION=v1.0.4
 COPY build-scripts/install-python-nss.sh /tmp/install-python-nss.sh

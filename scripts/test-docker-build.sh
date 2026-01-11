@@ -230,38 +230,28 @@ test_image() {
     docker rmi "${image_tag}" >/dev/null 2>&1 || true
 }
 
-# Test repository setup script independently
-test_repository_setup() {
-    log_step "Testing repository setup script"
+# Test Python availability in Fedora base image
+test_python_availability() {
+    log_step "Testing Python 3.13 availability in Fedora 43"
 
-    local repo_script="${PROJECT_ROOT}/build-scripts/setup-repositories.sh"
-
-    if [[ ! -f "${repo_script}" ]]; then
-        log_error "Repository setup script not found: ${repo_script}"
-        return 1
-    fi
-
-    # Test script in a UBI container
-    local test_image="registry.access.redhat.com/ubi9/ubi-minimal:latest"
+    local test_image="fedora:43"
     local container_id
 
-    log_info "Testing repository setup in UBI container"
+    log_info "Testing Python 3.13 in Fedora container"
 
     if container_id=$(docker run -d "${test_image}" sleep 300 2>/dev/null); then
-        # Copy script to container
-        if docker cp "${repo_script}" "${container_id}:/tmp/setup-repositories.sh" && \
-           docker exec "${container_id}" microdnf install -y dnf && \
-           docker exec "${container_id}" chmod +x /tmp/setup-repositories.sh && \
-           timeout "${TEST_TIMEOUT}" docker exec "${container_id}" /tmp/setup-repositories.sh --test; then
-            log_success "Repository setup script test passed"
+        # Test Python installation via DNF
+        if docker exec "${container_id}" dnf install -y python3 python3-pip && \
+           docker exec "${container_id}" python3 --version | grep -q "3.13"; then
+            log_success "Python 3.13 is available via DNF in Fedora 43"
         else
-            log_error "Repository setup script test failed"
+            log_error "Python 3.13 not available or wrong version"
         fi
 
         # Cleanup
         docker rm -f "${container_id}" >/dev/null 2>&1 || true
     else
-        log_error "Failed to start test container for repository setup"
+        log_error "Failed to start test container for Python test"
         return 1
     fi
 }
