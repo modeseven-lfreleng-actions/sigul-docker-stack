@@ -141,10 +141,20 @@ jobs:
             type=sha,prefix=pr-,enable=${{ github.event_name == 'pull_request' }}
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
+      - name: "Build start timestamp: ${{ matrix.component }} (${{ matrix.platform }})"
+        shell: bash
+        run: |
+          echo "🚀 Starting build at $(date '+%Y-%m-%d %H:%M:%S')"
+          echo "Component: ${{ matrix.component }}"
+          echo "Platform: ${{ matrix.platform }}"
+
       - name: "Build ${{ matrix.component }} container for ${{ matrix.platform }}"
         # yamllint disable-line rule:line-length
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83  # v6.18.0
         id: docker-build
+        env:
+          DOCKER_BUILDKIT: '1'
+          BUILDKIT_PROGRESS: plain
         with:
           context: .
           file: Dockerfile.${{ matrix.component }}
@@ -157,6 +167,12 @@ jobs:
           push: false
           cache-from: ${{ github.event.inputs.clear_cache == 'true' && 'type=registry,ref=localhost/null' || format('type=gha,scope={0}-{1}-{2}', matrix.component, matrix.platform, matrix.runner) }}
           cache-to: type=gha,mode=max,scope=${{ matrix.component }}-${{ matrix.platform }}-${{ matrix.runner }}
+
+      - name: "Build complete timestamp: ${{ matrix.component }} (${{ matrix.platform }})"
+        if: always()
+        shell: bash
+        run: |
+          echo "✅ Build finished at $(date '+%Y-%m-%d %H:%M:%S')"
 
       - name: 'Set build outputs for client amd64'
         id: build-client-amd64

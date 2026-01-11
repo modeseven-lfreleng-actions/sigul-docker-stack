@@ -103,7 +103,8 @@ install_python() {
     local url="https://www.python.org/ftp/python/${PYTHON_VERSION}/${tarball}"
 
     log_info "Downloading Python ${PYTHON_VERSION}..."
-    if ! wget -q "$url"; then
+    log_info "URL: $url"
+    if ! wget --progress=bar:force "$url" 2>&1; then
         log_error "Failed to download Python source from $url"
         cd /
         rm -rf "$workdir"
@@ -112,41 +113,45 @@ install_python() {
 
     # Extract
     log_info "Extracting Python source..."
-    tar xf "$tarball"
+    tar xvf "$tarball" | head -20
+    echo "... (extraction continuing)"
     cd "Python-${PYTHON_VERSION}"
 
     # Configure without ensurepip to avoid build failures
+    # Note: --enable-optimizations and --with-lto disabled for faster builds
+    # These optimizations can add 10-20 minutes to build time
     log_info "Configuring Python ${PYTHON_VERSION}..."
     if ! ./configure \
         --prefix="$PYTHON_INSTALL_PREFIX" \
-        --enable-optimizations \
-        --with-lto \
         --without-ensurepip \
         --enable-shared \
         LDFLAGS="-Wl,-rpath=${PYTHON_INSTALL_PREFIX}/lib" \
-        > /tmp/python-configure.log 2>&1; then
+        2>&1 | tee /tmp/python-configure.log; then
         log_error "Python configure failed. Check /tmp/python-configure.log"
-        tail -50 /tmp/python-configure.log >&2
         cd /
         rm -rf "$workdir"
         return 1
     fi
 
     # Build (use all available cores)
-    log_info "Building Python ${PYTHON_VERSION} (this may take 3-5 minutes)..."
-    if ! make -j"$(nproc)" > /tmp/python-build.log 2>&1; then
+    # Show progress with timestamps for better visibility in CI
+    log_info "Building Python ${PYTHON_VERSION} (this may take 2-4 minutes)..."
+    log_info "Build started at $(date '+%H:%M:%S')"
+    if ! make -j"$(nproc)" 2>&1 | tee /tmp/python-build.log | \
+        while IFS= read -r line; do
+            echo "[$(date '+%H:%M:%S')] $line"
+        done; then
         log_error "Python build failed. Check /tmp/python-build.log"
-        tail -100 /tmp/python-build.log >&2
         cd /
         rm -rf "$workdir"
         return 1
     fi
+    log_info "Build completed at $(date '+%H:%M:%S')"
 
     # Install
     log_info "Installing Python ${PYTHON_VERSION}..."
-    if ! make altinstall > /tmp/python-install.log 2>&1; then
+    if ! make altinstall 2>&1 | tee /tmp/python-install.log; then
         log_error "Python installation failed. Check /tmp/python-install.log"
-        tail -50 /tmp/python-install.log >&2
         cd /
         rm -rf "$workdir"
         return 1
