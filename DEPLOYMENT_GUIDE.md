@@ -9,7 +9,7 @@ SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 This guide provides step-by-step instructions for deploying the NSS-based Sigul infrastructure. The implementation uses a bridge-centric PKI architecture where the bridge component acts as the Certificate Authority, replacing the previous OpenSSL-based approach.
 
-## Production-Aligned Deployment
+## Production Deployment
 
 For deployment aligned with production configuration patterns (AWS-based deployments), see:
 
@@ -45,7 +45,7 @@ For deployment aligned with production configuration patterns (AWS-based deploym
   - Phase completion documents (PHASE1-7_COMPLETE.md)
   - Detailed implementation steps
 
-The production-aligned deployment includes:
+The production deployment includes:
 
 - Direct service invocation (no wrapper scripts)
 - Static IP assignment and FQDN-based hostnames

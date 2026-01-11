@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# Sigul Server Entrypoint - Production-Aligned
+# Sigul Server Entrypoint - Production
 #
-# This script provides a simplified, production-aligned entrypoint for the Sigul server.
+# This script provides a simplified, production entrypoint for the Sigul server.
 # It matches the direct invocation pattern used in production deployments.
 #
 # Production Pattern:
@@ -328,7 +328,7 @@ start_server_service() {
 
     success "Server initialized successfully"
 
-    # Execute server service with production-aligned command
+    # Execute server service with production command
     # Using exec to replace shell process with server process
     exec /usr/sbin/sigul_server \
         -c "$CONFIG_FILE"
@@ -339,8 +339,40 @@ start_server_service() {
 #######################################
 
 main() {
-    log "Sigul Server Entrypoint (Production-Aligned)"
-    log "============================================="
+    log "Sigul Server Entrypoint (Production)"
+    log "=============================================="
+
+    # Debug: Show environment and mounted volumes
+    log "Debug: Environment variables:"
+    log "  NSS_PASSWORD: ${NSS_PASSWORD:+[SET]}"
+    log "  SERVER_FQDN: ${SERVER_FQDN:-[NOT SET]}"
+    log "  DEBUG: ${DEBUG:-[NOT SET]}"
+    log ""
+    log "Debug: Checking mounted volumes and files:"
+    if [ -d /etc/sigul ]; then
+        log "  /etc/sigul exists: YES"
+    else
+        log "  /etc/sigul exists: NO"
+    fi
+    if [ -d /etc/sigul ]; then
+        log "  /etc/sigul contents:"
+        find /etc/sigul -ls 2>&1 | sed 's/^/    /' || log "    (cannot list)"
+    fi
+    if [ -d /etc/pki/sigul/server ]; then
+        log "  /etc/pki/sigul/server exists: YES"
+    else
+        log "  /etc/pki/sigul/server exists: NO"
+    fi
+    if [ -d /etc/pki/sigul/server ]; then
+        log "  /etc/pki/sigul/server contents:"
+        find /etc/pki/sigul/server -ls 2>&1 | sed 's/^/    /' || log "    (cannot list)"
+    fi
+    if [ -d /var/lib/sigul/server ]; then
+        log "  /var/lib/sigul/server exists: YES"
+    else
+        log "  /var/lib/sigul/server exists: NO"
+    fi
+    log ""
 
     # Run pre-flight validation
     validate_configuration

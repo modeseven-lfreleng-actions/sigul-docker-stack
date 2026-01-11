@@ -354,7 +354,7 @@ display_certificate_info() {
 #######################################
 
 main() {
-    log "Server Certificate Import (Production-Aligned PKI)"
+    log "Server Certificate Import (Production PKI)"
     log "=================================================="
     echo ""
 

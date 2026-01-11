@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+#
+# Patch to replace deprecated crypt module with passlib for Python 3.13+
+# compatibility. The crypt module became deprecated in Python 3.11 and
+# Python 3.13 removed it entirely.
+
+diff --git a/src/server.py b/src/server.py
+index bf73fcb..e09ee7e 100644
+--- a/src/server.py
++++ b/src/server.py
+@@ -18,7 +18,7 @@
+
+ import base64
+ import binascii
+-import crypt
++from passlib.hash import sha512_crypt
+ from datetime import datetime
+ import json
+ import glob
+@@ -590,7 +590,7 @@ class ServersConnection(object):
+             # Perform the encryption anyway to make timing attacks more
+             # difficult.
+             crypted_pw = 'xx'
+-        if (crypt.crypt(password, crypted_pw) != crypted_pw
++        if (sha512_crypt.verify(password, crypted_pw.decode('utf-8')) == False
+                 or crypted_pw == 'xx'):
+             self.auth_fail('password does not match')
+         if not user.admin:
+@@ -628,7 +628,7 @@ class ServersConnection(object):
+                 # Perform the encryption anyway to make timing attacks more
+                 # difficult.
+                 crypted_pw = 'xx'
+-            if (crypt.crypt(password, crypted_pw) != crypted_pw
++            if (sha512_crypt.verify(password, crypted_pw.decode('utf-8')) == False
+                     or crypted_pw == 'xx'):
+                 self.auth_fail('password does not match')
+             if user is None:
+diff --git a/src/server_common.py b/src/server_common.py
+index e069ecd..4aa48ee 100644
+--- a/src/server_common.py
++++ b/src/server_common.py
+@@ -17,7 +17,7 @@
+ # Red Hat Author: Patrick Uiterwijk <puiterwijk@redhat.com>
+
+ import copy
+-import crypt
++from passlib.hash import sha512_crypt
+ import enum
+ import logging
+ import os
+@@ -102,12 +102,12 @@ class User(object):
+
+     def __set_clear_password(self, clear_password):
+         random = nss.nss.generate_random(self.__salt_length)
+-        salt = '$6$'
++        salt = ''
+         for i in range(self.__salt_length):
+             salt += self.__salt_characters[random[i] %
+                                            len(self.__salt_characters)]
+-        self.sha512_password = crypt.crypt(
+-            clear_password, salt).encode('utf-8')
++        self.sha512_password = sha512_crypt.using(rounds=5000).hash(
++            clear_password, salt=salt).encode('utf-8')
+     clear_password = property(fset=__set_clear_password,
+                               doc='Setting this attribute updates '
+                               'sha512_password')

@@ -363,7 +363,7 @@ display_certificate_info() {
 #######################################
 
 main() {
-    log "Client Certificate Import (Production-Aligned PKI)"
+    log "Client Certificate Import (Production PKI)"
     log "=================================================="
     echo ""
 

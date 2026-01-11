@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+#
+# Act configuration for local GitHub Actions testing
+# https://github.com/nektos/act
+
+# Use medium-sized runner images for better compatibility
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+-P ubuntu-24.04=catthehacker/ubuntu:act-24.04
+-P ubuntu-24.04-arm=catthehacker/ubuntu:act-24.04
+
+# Reuse Docker daemon from host
+--reuse
+
+# Enable verbose output for debugging
+--verbose
+
+# Use host Docker network to avoid connectivity issues
+--container-daemon-socket -
+
+# Environment variables for local testing
+--env DOCKER_BUILDKIT=1
+--env BUILDKIT_PROGRESS=plain
+
+# Artifact server for job outputs
+--artifact-server-path /tmp/act-artifacts
+
+# Set default secrets (can be overridden with --secret-file)
+# --secret-file .secrets

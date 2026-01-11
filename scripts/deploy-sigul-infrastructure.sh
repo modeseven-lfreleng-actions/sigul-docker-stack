@@ -938,7 +938,7 @@ deploy_sigul_services() {
 
     # Start cert-init container first to pre-generate all certificates
     log "Starting certificate initialization (cert-init)..."
-    if ${compose_cmd} -f "${COMPOSE_FILE}" up cert-init; then
+    if ${compose_cmd} -f "${COMPOSE_FILE}" up --no-build cert-init; then
         success "Certificate initialization completed"
 
         # Verify cert-init completed successfully
@@ -960,7 +960,7 @@ deploy_sigul_services() {
 
     # Start Sigul server
     log "Starting Sigul server..."
-    if ${compose_cmd} -f "${COMPOSE_FILE}" up -d sigul-server; then
+    if ${compose_cmd} -f "${COMPOSE_FILE}" up --no-build -d sigul-server; then
         success "Sigul server container started"
 
         # Wait briefly for container to initialize before IP detection
@@ -1120,7 +1120,7 @@ deploy_sigul_services() {
 
     # Start Sigul bridge
     log "Starting Sigul bridge..."
-    if ${compose_cmd} -f "${COMPOSE_FILE}" up -d sigul-bridge; then
+    if ${compose_cmd} -f "${COMPOSE_FILE}" up --no-build -d sigul-bridge; then
         success "Sigul bridge container started"
 
         # Capture Sigul bridge container IP
