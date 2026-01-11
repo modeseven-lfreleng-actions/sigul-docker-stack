@@ -39,10 +39,10 @@ RUN dnf install -y --setopt=install_weak_deps=False --allowerasing \
 COPY patches/ /tmp/patches/
 
 # Install Python 3.12 (Python 3.9 is EOL, python-nss-ng wheels require 3.10+)
-COPY build-scripts/install-python312.sh /tmp/install-python312.sh
-RUN chmod +x /tmp/install-python312.sh && \
-    /tmp/install-python312.sh --verify && \
-    rm /tmp/install-python312.sh
+COPY build-scripts/install-python.sh /tmp/install-python.sh
+RUN chmod +x /tmp/install-python.sh && \
+    /tmp/install-python.sh --version 3.12.8 --verify && \
+    rm /tmp/install-python.sh
 
 # Install python-nss-ng from PyPI (now compatible with Python 3.12)
 ENV INSTALL_SOURCE=pypi
