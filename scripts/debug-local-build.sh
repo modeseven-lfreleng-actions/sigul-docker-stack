@@ -187,8 +187,6 @@ pre_build_checks() {
     fi
 
     local required_scripts=(
-        "setup-repositories.sh"
-        "install-python.sh"
         "install-python-nss.sh"
     )
 
@@ -238,13 +236,19 @@ build_image() {
     # Change to project root for build context
     cd "${PROJECT_ROOT}"
 
+    # Set environment variables for BuildKit to force output
+    export BUILDKIT_PROGRESS=plain
+    export DOCKER_BUILDKIT=1
+
+    log_debug "Environment: BUILDKIT_PROGRESS=${BUILDKIT_PROGRESS}, DOCKER_BUILDKIT=${DOCKER_BUILDKIT}"
+
     # Prepare build arguments
     local build_args=(
         docker buildx build
         --platform "${PLATFORM}"
         --file "${dockerfile}"
         --tag "${image_tag}"
-        --progress="${BUILDKIT_PROGRESS}"
+        --progress=plain
         --load
     )
 
@@ -254,27 +258,31 @@ build_image() {
         log_warning "Cache disabled - build will take longer"
     fi
 
-    # Add verbose output if requested
-    if [[ "${VERBOSE}" == "true" ]]; then
-        build_args+=(--progress=plain)
-    fi
-
     # Add build context
     build_args+=(.)
 
     log_info "Starting build..."
+    log_info "You should see build output below in real-time..."
     echo ""
     echo -e "${CYAN}Build Command:${NC}"
     echo "  ${build_args[*]}"
     echo ""
+    echo "=========================================="
+    echo ""
 
     build_start=$(date +%s)
 
-    # Run the build
-    if "${build_args[@]}"; then
-        build_end=$(date +%s)
-        duration=$((build_end - build_start))
+    # Run the build directly to terminal - this will show all output
+    "${build_args[@]}"
+    local build_result=$?
 
+    echo ""
+    echo "=========================================="
+
+    build_end=$(date +%s)
+    duration=$((build_end - build_start))
+
+    if [ $build_result -eq 0 ]; then
         log_success "Build completed successfully!"
         log_success "Build duration: ${duration}s ($(printf '%d:%02d' $((duration/60)) $((duration%60))))"
 
@@ -298,9 +306,6 @@ build_image() {
 
         return 0
     else
-        build_end=$(date +%s)
-        duration=$((build_end - build_start))
-
         log_error "Build failed after ${duration}s"
         return 1
     fi
@@ -341,7 +346,7 @@ main() {
                 ;;
             -d|--debug)
                 DEBUG=true
-                log_debug "Debug mode enabled"
+                VERBOSE=true  # Auto-enable verbose when debug is on
                 shift
                 ;;
             -v|--verbose)
