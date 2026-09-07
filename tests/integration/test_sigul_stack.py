@@ -40,16 +40,14 @@ Requirements:
 """
 
 import os
-import sys
-import time
 import socket
 import subprocess
+import sys
 import tempfile
-from typing import List, Tuple
+import time
 
-import pytest
 import docker
-
+import pytest
 
 # Test Configuration
 COMPOSE_FILE = "docker-compose.sigul.yml"
@@ -234,8 +232,8 @@ class SigulTestFixture:
             return f"Error getting logs for {container_name}: {e}"
 
     def run_command_in_container(
-        self, container_name: str, command: List[str]
-    ) -> Tuple[int, str, str]:
+        self, container_name: str, command: list[str]
+    ) -> tuple[int, str, str]:
         """Run a command in a container and return exit code, stdout, stderr"""
         try:
             container = self.containers.get(container_name)
@@ -341,7 +339,6 @@ class TestInfrastructure:
         # Note: In Sigul architecture, server connects TO bridge, not vice versa
         # This test is disabled as it checks incorrect connectivity direction
         # The server should establish connection to bridge, not be reachable by bridge
-        pass
 
 
 class TestCertificates:
@@ -450,7 +447,6 @@ class TestCommunication:
         # Note: In Sigul architecture, server connects TO bridge, not vice versa
         # This test is disabled as it checks incorrect connectivity direction
         # The server should establish connection to bridge, not be reachable by bridge
-        pass
 
     def test_bridge_configuration(self, sigul_stack):
         """Test bridge configuration is correct"""
@@ -770,12 +766,10 @@ class TestErrorConditions:
     def test_missing_certificates_handling(self, sigul_stack):
         """Test behavior when certificates are missing or invalid"""
         # This would be implemented to test certificate validation edge cases
-        pass
 
     def test_network_failure_handling(self, sigul_stack):
         """Test behavior during network connectivity issues"""
         # This would be implemented to test network failure scenarios
-        pass
 
 
 # Utility functions for running tests

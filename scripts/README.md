@@ -33,7 +33,7 @@ For most users, these are the scripts you'll need:
 
 <!-- markdownlint-disable MD013 -->
 | Script | Purpose | When to Use |
-|--------|---------|-------------|
+| -------- | --------- | ------------- |
 | `sigul-init.sh` | **Unified initialization script** | Container startup (all roles) |
 | `generate-complete-pki.sh` | Complete PKI infrastructure generation | Setting up test certificates |
 | `generate-test-pki.sh` | Test PKI generation wrapper | Development and testing |
@@ -43,7 +43,7 @@ For most users, these are the scripts you'll need:
 
 <!-- markdownlint-disable MD013 -->
 | Script | Purpose | When to Use |
-|--------|---------|-------------|
+| -------- | --------- | ------------- |
 | `test-local.sh` | Local platform testing | Quick validation |
 | `test-all-architectures.sh` | Multi-architecture testing | Cross-platform validation |
 | `test-mock-signing.sh` | Mock signing functionality testing | Development testing |
@@ -54,7 +54,7 @@ For most users, these are the scripts you'll need:
 
 <!-- markdownlint-disable MD013 -->
 | Script | Purpose | When to Use |
-|--------|---------|-------------|
+| -------- | --------- | ------------- |
 | `deploy-sigul-infrastructure.sh` | Deploy infrastructure stack | Test/dev environments |
 | `run-integration-tests.sh` | End-to-end integration testing | CI/CD pipelines |
 | `test-infrastructure.sh` | Infrastructure validation | Infrastructure testing |
